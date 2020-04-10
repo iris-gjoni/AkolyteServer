@@ -3,7 +3,6 @@ package ClientRequests;
 import database.MongoDbConnector;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by irisg on 08/04/2020.
@@ -19,9 +18,6 @@ public class AddNewDataRequestHandler {
     }
 
     public boolean AddDataToDB(HashMap<String, String> values){
-        mongoDbConnector.connectToDb();
-        boolean result =  mongoDbConnector.writeLoadedValuesAndClear(values);
-        mongoDbConnector.disconnectToDb();
-        return result;
+        return mongoDbConnector.writeLoadedValuesAndClear(values);
     }
 }

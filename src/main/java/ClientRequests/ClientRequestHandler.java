@@ -85,10 +85,10 @@ public class ClientRequestHandler {
             final boolean result = loginRequestHandler.verifyLogonRequest(requestUserPass[1], requestUserPass[2]);
             System.out.println("result=" + result);
             if (result) {
-                System.out.println("logged in");
+                System.out.println("logged in\n\n");
                 sendResponse("loggedOn".getBytes());
             } else {
-                System.out.println("failed login");
+                System.out.println("failed login\n\n");
                 sendResponse("Failed Authentication".getBytes());
             }
 

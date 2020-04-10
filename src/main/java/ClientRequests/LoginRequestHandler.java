@@ -22,13 +22,11 @@ public class LoginRequestHandler {
         if (userData != null) {
             if ((loadedPass = userData.get("password")) != null) {
                 if (loadedPass.equals(pass)) {
-                    mongoDbConnector.disconnectToDb();
                     return true;
                 }
             }
             System.out.println("readData returned null");
         }
-        mongoDbConnector.disconnectToDb();
         return false;
     }
 

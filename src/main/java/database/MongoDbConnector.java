@@ -23,7 +23,7 @@ public class MongoDbConnector {
     private MongoHelper helper = new MongoHelper();
 
     public MongoDbConnector(){
-
+        connectToDb();
     }
 
     public void connectToDb(){
@@ -54,8 +54,6 @@ public class MongoDbConnector {
     }
 
     public HashMap<String, String> readData(String user){
-        connectToDb();
-
         Bson bson = new BasicDBObject("name", user);
         FindIterable<Document> findIterable = clients.find(bson);
         if(!findIterable.iterator().hasNext()){
@@ -74,33 +72,27 @@ public class MongoDbConnector {
     }
 
     public boolean writeLoadedValuesAndClear(HashMap<String, String> passedInMap){
-        connectToDb();
         try {
             Document document = new Document();
             passedInMap.forEach(document::append);
             writeOneDbDocument(document);
-            disconnectToDb();
             return true;
         } catch (MongoWriteException e){
             e.printStackTrace();
-            disconnectToDb();
             return false;
         }
     }
 
 
     public boolean writeLoadedValuesAndClear(){
-        connectToDb();
         try {
             Document document = new Document();
             valueMap.forEach(document::append);
             writeOneDbDocument(document);
             clearMap();
-            disconnectToDb();
             return true;
         } catch (Exception e){
             e.printStackTrace();
-            disconnectToDb();
             return false;
         }
     }
