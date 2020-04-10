@@ -30,6 +30,10 @@ public class MongoHelper {
         return values;
     }
 
+    public HashMap<String, String> emptyMap(){
+        return new HashMap<>();
+    }
+
 
 
 }

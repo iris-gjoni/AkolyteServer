@@ -58,6 +58,9 @@ public class MongoDbConnector {
 
         Bson bson = new BasicDBObject("name", user);
         FindIterable<Document> findIterable = clients.find(bson);
+        if(!findIterable.iterator().hasNext()){
+            return helper.emptyMap();
+        }
 
         return helper.extractData(findIterable.iterator().next().toString());
     }

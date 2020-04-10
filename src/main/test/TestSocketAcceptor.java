@@ -26,7 +26,7 @@ public class TestSocketAcceptor {
     @Test
     public void testLogin() throws IOException {
 
-        ByteBuffer byteBuffer = java.nio.ByteBuffer.allocate(48);
+        ByteBuffer byteBuffer = java.nio.ByteBuffer.allocate(1024);
         byteBuffer.put("RQ1.jeff.password".getBytes());
 
         SocketChannel socketChannel = SocketChannel.open();
@@ -46,7 +46,7 @@ public class TestSocketAcceptor {
         while (waitResponse) {
             int bytesRead = socketChannel.read(byteBuffer);
             if (bytesRead > 0){
-                String message = ASCIIUtility.toString(byteBuffer.array(),0, bytesRead);
+                String message = new String(byteBuffer.array()).trim();
                 System.out.println("message received: " + message);
             } else {
                 System.out.println("failed to decode");

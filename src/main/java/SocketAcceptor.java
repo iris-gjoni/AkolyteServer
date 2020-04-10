@@ -1,5 +1,4 @@
 import ClientRequests.ClientRequestHandler;
-import ClientRequests.LoginRequestHandler;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.util.ASCIIUtility;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -20,7 +19,6 @@ public class SocketAcceptor implements Runnable {
     private final Selector selector = Selector.open();
     private final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-    private final ExecutorService service = Executors.newSingleThreadExecutor();
     private boolean running = true;
     private final ClientRequestHandler clientRequestHandler = new ClientRequestHandler();
 
@@ -38,8 +36,9 @@ public class SocketAcceptor implements Runnable {
     @Override
     public void run() {
         while (running) {
-            SocketChannel socketChannel = null;
+            SocketChannel socketChannel;
             try {
+                byteBuffer.clear();
                 socketChannel = serverSocketChannel.accept();
                 int bytesRead = socketChannel.read(byteBuffer);
                 if (bytesRead > 0) {
@@ -52,9 +51,10 @@ public class SocketAcceptor implements Runnable {
     }
 
     private void handleMessage(SocketChannel socketChannel, int bytesRead) throws IOException {
+
         byteBuffer.flip();
         System.out.println("bytes read: " + bytesRead);
-        String message = ASCIIUtility.toString(byteBuffer.array(), 0, bytesRead);
+        String message = new String(byteBuffer.array(), 0, bytesRead);
         System.out.println(message);
         System.out.println(message.substring(0, 3));
 

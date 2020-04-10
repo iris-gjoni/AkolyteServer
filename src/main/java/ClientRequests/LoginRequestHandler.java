@@ -19,11 +19,14 @@ public class LoginRequestHandler {
     public boolean verifyLogonRequest(final String user, final String pass){
         HashMap<String, String> userData = mongoDbConnector.readData(user);
         final String loadedPass;
-        if((loadedPass = userData.get("password") )!= null){
-            if (loadedPass.equals(pass)){
-                mongoDbConnector.disconnectToDb();
-                return true;
+        if (userData != null) {
+            if ((loadedPass = userData.get("password")) != null) {
+                if (loadedPass.equals(pass)) {
+                    mongoDbConnector.disconnectToDb();
+                    return true;
+                }
             }
+            System.out.println("readData returned null");
         }
         mongoDbConnector.disconnectToDb();
         return false;

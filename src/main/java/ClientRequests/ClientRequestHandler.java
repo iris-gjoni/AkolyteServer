@@ -89,7 +89,7 @@ public class ClientRequestHandler {
                 sendResponse("loggedOn".getBytes());
             } else {
                 System.out.println("failed login");
-                sendResponse("Failed".getBytes());
+                sendResponse("Failed Authentication".getBytes());
             }
 
         }
