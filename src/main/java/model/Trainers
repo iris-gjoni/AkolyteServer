@@ -1,3 +1,37 @@
 trainers:
   tyler
   iris
+
+trainer fields:
+  uniqueID - done by mongo
+  name
+  password - need to sercure this
+  games:
+    list:
+      cod
+      fifa
+  permissions - trainer
+  accountCreationDate
+  isAccountActive
+  possible:
+  TrainerRating
+
+
+User fields:
+  uniqueId - mongo
+  unique Akolyte userId
+  password - secure
+  permissions = client
+  accountCreationDate
+  isAccountActive
+
+bookingSlot:
+  Trainer - the trainer that created it
+  startTime
+  endTime
+  isBooked
+  userThatBooked
+  DateCreated
+  hasExpired
+
+

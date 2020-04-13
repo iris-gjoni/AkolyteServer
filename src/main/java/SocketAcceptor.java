@@ -1,13 +1,10 @@
 import ClientRequests.ClientRequestHandler;
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.ASCIIUtility;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by irisg on 29/03/2020.
@@ -15,7 +12,12 @@ import java.util.concurrent.Executors;
 public class SocketAcceptor implements Runnable {
 
     public static final String LOGIN = "RQ1";
-    public static final String ADD_NEW_DATA = "RQ2";
+    public static final String CREATE_USER_ACCOUNT = "CNU";
+    public static final String UPDATE_ACCOUNT = "UAC";
+    public static final String LOAD_AVAILABLE_SLOTS = "LSL";
+    public static final String BOOK_SLOT = "BSL";
+    public static final String PAYMENT_COMPLETE = "PAY";
+
     private final Selector selector = Selector.open();
     private final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
@@ -60,10 +62,28 @@ public class SocketAcceptor implements Runnable {
 
         String requestType = message.substring(0, 3);
 
-        if (requestType.equals(LOGIN)) {
-            clientRequestHandler.handleLoginRequest(socketChannel, message);
-        } else if (requestType.equals(ADD_NEW_DATA)){
-            clientRequestHandler.handleAddNewDataRequest(socketChannel, message);
+        switch (requestType) {
+            case LOGIN:
+                clientRequestHandler.handleLoginRequest(socketChannel, message);
+                break;
+            case CREATE_USER_ACCOUNT:
+                clientRequestHandler.handleNewUserAccountRequest(socketChannel, message);
+                break;
+            case UPDATE_ACCOUNT:
+                clientRequestHandler.handleUpdateAccountRequest(socketChannel, message);
+                break;
+            case LOAD_AVAILABLE_SLOTS:
+                clientRequestHandler.handleLoadAvaibleSlotsRequest(socketChannel, message);
+                break;
+            case BOOK_SLOT:
+                clientRequestHandler.handleBookSlotRequest(socketChannel, message);
+                break;
+            case PAYMENT_COMPLETE:
+                clientRequestHandler.handlePaymentComplete(socketChannel, message);
+                break;
+            default:
+
+                break;
         }
     }
 

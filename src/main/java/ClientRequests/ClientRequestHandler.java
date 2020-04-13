@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by irisg on 31/03/2020.
@@ -39,17 +37,17 @@ public class ClientRequestHandler {
     }
 
     /* expect format RQ2.name.name.password.password.other.n.n2... */
-    public void handleAddNewDataRequest(final SocketChannel socketChannel, final String message) {
+    public void handleNewUserAccountRequest(final SocketChannel socketChannel, final String message) {
         this.responseChannel = socketChannel;
         try {
-            exctractNewDataMessage(message);
+            exctractNewUserAccountMessage(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public void exctractNewDataMessage(final String message) throws IOException {
+    public void exctractNewUserAccountMessage(final String message) throws IOException {
         String[] newDataValues = message.split(splitter); // EXPECTING RQ1.iris.password
         int size = newDataValues.length;
         System.out.println("size of newDataValues: " + size);
@@ -105,4 +103,23 @@ public class ClientRequestHandler {
     public void clearValueMap(){
         this.extractedValues.clear();
     }
+
+    /* in order to control who is able to create a Trainer account we will create the accounts on our side and give them a login
+    * the trainers will then open the app, login with the default login and be prompted to update their account info*/
+    public void handleUpdateAccountRequest(SocketChannel socketChannel, String message) {
+
+    }
+
+    public void handleLoadAvaibleSlotsRequest(SocketChannel socketChannel, String message) {
+
+    }
+
+    public void handleBookSlotRequest(SocketChannel socketChannel, String message) {
+
+    }
+
+    public void handlePaymentComplete(SocketChannel socketChannel, String message) {
+
+    }
+
 }
