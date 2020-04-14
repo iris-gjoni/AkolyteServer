@@ -14,7 +14,6 @@ public class AddNewDataRequestHandler {
 
     public AddNewDataRequestHandler(final MongoDbConnector mongoDbConnector) {
         this.mongoDbConnector = mongoDbConnector;
-
     }
 
     public boolean AddDataToDB(HashMap<String, String> values){

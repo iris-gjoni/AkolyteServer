@@ -1,5 +1,7 @@
 import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.Loader;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.util.ASCIIUtility;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -9,6 +11,8 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,9 +22,11 @@ import java.util.concurrent.Executors;
 public class TestSocketAcceptor {
 
     private static final ExecutorService service = Executors.newSingleThreadExecutor();
+    private static final Queue<ClientRequest> queue = new ArrayBlockingQueue<>(10);
+    private static final Logger logger = Logger.getLogger(TestSocketAcceptor.class);
 
     public TestSocketAcceptor() throws IOException {
-        service.execute(new SocketAcceptor());
+        service.execute(new SocketAcceptor(queue));
     }
 
     @Test

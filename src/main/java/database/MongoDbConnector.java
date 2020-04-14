@@ -6,6 +6,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.apache.log4j.Logger;
 import org.bson.*;
 import org.bson.conversions.Bson;
 
@@ -21,88 +22,89 @@ public class MongoDbConnector {
     private MongoCollection<Document> clients;
     private HashMap<String, Object> valueMap = new HashMap<>();
     private MongoHelper helper = new MongoHelper();
+    private final Logger logger = Logger.getLogger(MongoDbConnector.class);
 
-    public MongoDbConnector(){
+    public MongoDbConnector() {
         connectToDb();
     }
 
-    public void connectToDb(){
+    public void connectToDb() {
         mongoClient = new MongoClient("localhost", 27017);
-        System.out.println(mongoClient.toString());
+        logger.debug(mongoClient.toString());
 
         mongoDatabase = mongoClient.getDatabase("testDb");
         clients = mongoDatabase.getCollection("clients");
 
-        System.out.println("connected to DataBase: " + mongoDatabase.getName());
+        logger.info("connected to DataBase: " + mongoDatabase.getName());
     }
 
-    public void disconnectToDb(){
+    public void disconnectToDb() {
         mongoClient.close();
     }
 
     public Document createOneDbDocument(HashMap<String, Object> map) {
         Document document = new Document();
-        for (String key : map.keySet()){
+        for (String key : map.keySet()) {
             document.append(key, map.get(key));
         }
         return document;
     }
 
     private void writeOneDbDocument(Document document) {
-            clients.insertOne(document);
-            System.out.println("successfully wrote data");
+        clients.insertOne(document);
+        logger.info("successfully wrote data");
     }
 
-    public HashMap<String, String> readData(String user){
+    public HashMap<String, String> readData(String user) {
         Bson bson = new BasicDBObject("name", user);
         FindIterable<Document> findIterable = clients.find(bson);
-        if(!findIterable.iterator().hasNext()){
+        if (!findIterable.iterator().hasNext()) {
             return helper.emptyMap();
         }
 
         return helper.extractData(findIterable.iterator().next().toString());
     }
 
-    public void writeLoadedValues(){
+    public void writeLoadedValues() {
         Document document = new Document();
-        for (String key : valueMap.keySet()){
+        for (String key : valueMap.keySet()) {
             document.append(key, valueMap.get(key));
         }
         writeOneDbDocument(document);
     }
 
-    public boolean writeLoadedValuesAndClear(HashMap<String, String> passedInMap){
+    public boolean writeLoadedValuesAndClear(HashMap<String, String> passedInMap) {
         try {
             Document document = new Document();
             passedInMap.forEach(document::append);
             writeOneDbDocument(document);
             return true;
-        } catch (MongoWriteException e){
+        } catch (MongoWriteException e) {
             e.printStackTrace();
             return false;
         }
     }
 
 
-    public boolean writeLoadedValuesAndClear(){
+    public boolean writeLoadedValuesAndClear() {
         try {
             Document document = new Document();
             valueMap.forEach(document::append);
             writeOneDbDocument(document);
             clearMap();
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
 
-    public void addValue(final String key, final Object value){
+    public void addValue(final String key, final Object value) {
         valueMap.put(key, value);
     }
 
-    public void clearMap(){
+    public void clearMap() {
         valueMap.clear();
     }
 

@@ -1,5 +1,7 @@
 package database;
 
+import org.apache.log4j.Logger;
+
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import java.util.HashMap;
 
@@ -7,6 +9,9 @@ import java.util.HashMap;
  * Created by irisg on 07/04/2020.
  */
 public class MongoHelper {
+
+    private final Logger logger = Logger.getLogger(MongoHelper.class);
+
 
     public MongoHelper() {
     }
@@ -23,8 +28,9 @@ public class MongoHelper {
             keyValue = ss.split("=");
             values.put(keyValue[0], keyValue[1]);
         }
+        logger.info("extracting data:");
         values.forEach((k,v)-> {
-            System.out.println(k + " , " + v);
+            logger.info(k + " , " + v);
         });
 
         return values;

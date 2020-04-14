@@ -1,6 +1,7 @@
 package ClientRequests;
 
 import database.MongoDbConnector;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,19 +14,17 @@ import java.util.HashMap;
 public class ClientRequestHandler {
 
     public static final String splitter = "\\.";
-    // need a mongoDB connection - spoofing for now
     private final MongoDbConnector mongoDbConnector = new MongoDbConnector();
     private final LoginRequestHandler loginRequestHandler = new LoginRequestHandler(mongoDbConnector);
     private final AddNewDataRequestHandler newDataRequestHandler = new AddNewDataRequestHandler(mongoDbConnector);
     private final HashMap<String, String> extractedValues = new HashMap<>();
     private SocketChannel responseChannel;
     private final ByteBuffer responseBuffer = ByteBuffer.allocate(1024);
+    private final Logger logger = Logger.getLogger(ClientRequestHandler.class);
 
     public ClientRequestHandler() {
 
     }
-
-
 
     public void handleLoginRequest(final SocketChannel socketChannel, final String message) {
         this.responseChannel = socketChannel;
@@ -50,7 +49,7 @@ public class ClientRequestHandler {
     public void exctractNewUserAccountMessage(final String message) throws IOException {
         String[] newDataValues = message.split(splitter); // EXPECTING RQ1.iris.password
         int size = newDataValues.length;
-        System.out.println("size of newDataValues: " + size);
+        logger.info("size of newDataValues: " + size);
         clearValueMap();
 
         if ((size % 2 )!= 0) { // not even
@@ -74,19 +73,19 @@ public class ClientRequestHandler {
     /* expect format RQ1.iris.password */
     private void exctractLogonMessage(String message) throws IOException {
         String[] requestUserPass = message.split(splitter); // EXPECTING RQ1.iris.password
-        System.out.println(requestUserPass.length);
+        logger.info(requestUserPass.length);
         /* temp printing for debugging */
         for (int i = 0; i < requestUserPass.length; i++) {
-            System.out.println(requestUserPass[i]);
+            logger.info(requestUserPass[i]);
         }
         if (requestUserPass.length == 3) { // validate the number of fields sent
             final boolean result = loginRequestHandler.verifyLogonRequest(requestUserPass[1], requestUserPass[2]);
-            System.out.println("result=" + result);
+            logger.info("result=" + result);
             if (result) {
-                System.out.println("logged in\n\n");
+                logger.info("logged in\n\n");
                 sendResponse("loggedOn".getBytes());
             } else {
-                System.out.println("failed login\n\n");
+                logger.info("failed login\n\n");
                 sendResponse("Failed Authentication".getBytes());
             }
 

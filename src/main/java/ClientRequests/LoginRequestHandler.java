@@ -1,6 +1,8 @@
 package ClientRequests;
 
 import database.MongoDbConnector;
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 
 /**
@@ -9,6 +11,8 @@ import java.util.HashMap;
 public class LoginRequestHandler {
 
     final private MongoDbConnector mongoDbConnector;
+    private final Logger logger = Logger.getLogger(LoginRequestHandler.class);
+
 
     public LoginRequestHandler(final MongoDbConnector mongoDbConnector) {
         this.mongoDbConnector = mongoDbConnector;
@@ -25,7 +29,7 @@ public class LoginRequestHandler {
                     return true;
                 }
             }
-            System.out.println("readData returned null");
+            logger.info("readData returned null");
         }
         return false;
     }
