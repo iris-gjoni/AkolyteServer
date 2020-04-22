@@ -21,77 +21,74 @@ import java.util.concurrent.Executors;
  */
 public class TestSocketAcceptor {
 
-    private static final ExecutorService service = Executors.newSingleThreadExecutor();
+    private static final ExecutorService service = Executors.newCachedThreadPool();
     private static final Queue<ClientRequest> queue = new ArrayBlockingQueue<>(10);
     private static final Logger logger = Logger.getLogger(TestSocketAcceptor.class);
 
     public TestSocketAcceptor() throws IOException {
-        service.execute(new SocketAcceptor(queue));
+        service.execute(new SocketAcceptor(queue, 1001, "192.168.0.8"));
+        service.execute(new WorkerThread(queue, 27017));
     }
 
     @Test
-    public void testLogin() throws IOException {
+    public void testLoginOnSocket() throws IOException {
 
         ByteBuffer byteBuffer = java.nio.ByteBuffer.allocate(1024);
-        byteBuffer.put("RQ1.jeff.password".getBytes());
+        byteBuffer.put("RQ1|irisgjoni@hotmail.co.uk|password".getBytes());
 
         SocketChannel socketChannel = SocketChannel.open();
+        socketChannel.configureBlocking(false);
         socketChannel.connect(new InetSocketAddress("192.168.0.8", 1001));
-        System.out.println(socketChannel.getLocalAddress());
-        System.out.println(socketChannel.getRemoteAddress() + "\n\n sending message: \n");
-//        Socket socket = socketChannel.socket();
+
+        logger.info(socketChannel.getRemoteAddress() + " sending message: \n");
+        logger.info(socketChannel.finishConnect());
 
         byteBuffer.flip();
+        long startTime = System.currentTimeMillis();
         socketChannel.write(byteBuffer);
-
-        // ready for use in the read.
         byteBuffer.clear();
 
         boolean waitResponse = true;
-
         while (waitResponse) {
             int bytesRead = socketChannel.read(byteBuffer);
             if (bytesRead > 0){
-                String message = new String(byteBuffer.array()).trim();
-                System.out.println("message received: " + message);
-            } else {
-                System.out.println("failed to decode");
+                waitResponse = false;
+                String message = new String(byteBuffer.array(), 0, bytesRead);
+                logger.info("message received: " + message);
             }
-            waitResponse = false;
         }
+        logger.info("time taken = " + (System.currentTimeMillis() - startTime));
         assert true;
     }
 
+
+
     @Test
-    public void testAddData() throws IOException {
+    public void testCreateAccountOnSocket() throws IOException {
 
         ByteBuffer byteBuffer = java.nio.ByteBuffer.allocate(1024);
-        byteBuffer.put("RQ2.name.gerry.password.password.location.singapore.game.COD".getBytes());
+        byteBuffer.put("CNU|fake1@hotmail.co.uk|iris|fake".getBytes());
 
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.connect(new InetSocketAddress("192.168.0.8", 1001));
-        System.out.println(socketChannel.getLocalAddress());
-        System.out.println(socketChannel.getRemoteAddress() + "\n\n sending message: \n");
-//        Socket socket = socketChannel.socket();
+        logger.info(socketChannel.getLocalAddress());
+        logger.info(socketChannel.getRemoteAddress() + "\n\n sending message: \n");
 
         byteBuffer.flip();
+        long startTime = System.currentTimeMillis();
         socketChannel.write(byteBuffer);
-
-        // ready for use in the read.
         byteBuffer.clear();
 
         boolean waitResponse = true;
-
         while (waitResponse) {
             int bytesRead = socketChannel.read(byteBuffer);
             if (bytesRead > 0){
-                String message = ASCIIUtility.toString(byteBuffer.array(),0, bytesRead);
-                System.out.println("message received: " + message);
-            } else {
-                System.out.println("failed to decode");
+                waitResponse = false;
+                String message = new String(byteBuffer.array(), 0, bytesRead);
+                logger.info("message received: " + message);
             }
-            waitResponse = false;
         }
+        logger.info("time taken = " + (System.currentTimeMillis() - startTime));
         assert true;
     }
 

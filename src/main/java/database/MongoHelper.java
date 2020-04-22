@@ -16,12 +16,10 @@ public class MongoHelper {
     public MongoHelper() {
     }
 
-    public HashMap<String, String> extractData(final String s){
+    public void extractData(final String s, HashMap<String, String> values){
         final int start = s.indexOf("_") + 1;
         final int end = s.length() - 2;
         String[] subStrings = s.substring(start, end).replaceAll(" ", "").split(",");
-
-            HashMap<String, String> values = new HashMap<>();
 
         String[] keyValue;
         for ( String ss : subStrings){
@@ -33,12 +31,13 @@ public class MongoHelper {
             logger.info(k + " , " + v);
         });
 
-        return values;
     }
 
     public HashMap<String, String> emptyMap(){
         return new HashMap<>();
     }
+
+
 
 
 

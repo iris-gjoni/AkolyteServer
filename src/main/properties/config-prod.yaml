@@ -1,0 +1,7 @@
+queueCapacity: 10
+socketConnectPort: 1001
+socketConnectHost: "192.168.0.8"
+mongoConnectPort: 27017
+mongoConnectHost: "192.168.0.8"
+logFilePath: "file:///C:/workspace/major1/src/companyApp/src/main/properties/log4j.xml"
+

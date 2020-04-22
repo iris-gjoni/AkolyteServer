@@ -1,8 +1,6 @@
 import database.MongoDbConnector;
 import org.junit.Test;
 
-import java.util.HashMap;
-
 /**
  * Created by irisg on 06/04/2020.
  */
@@ -11,7 +9,7 @@ public class testMongoConnection {
 
     @Test
     public void test(){
-        MongoDbConnector dbConnector = new MongoDbConnector();
+        MongoDbConnector dbConnector = new MongoDbConnector(27017);
         dbConnector.connectToDb();
 
 
@@ -26,10 +24,10 @@ public class testMongoConnection {
 
     @Test
     public void test2(){
-        MongoDbConnector dbConnector = new MongoDbConnector();
+        MongoDbConnector dbConnector = new MongoDbConnector(27017);
         dbConnector.connectToDb();
 
-        dbConnector.readData("jeff");
+        dbConnector.readByEmail("jeff");
     }
 
 }

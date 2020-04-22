@@ -21,7 +21,7 @@ public class WorkerThread implements Runnable{
 
     public boolean running = true;
     private final Queue<ClientRequest> queue;
-    private final ClientRequestHandler clientRequestHandler = new ClientRequestHandler();
+    private final ClientRequestHandler clientRequestHandler;
     private static final Logger logger = Logger.getLogger(WorkerThread.class);
 
     private static final long STATS_TIME_MILLIS = 60000;
@@ -29,10 +29,9 @@ public class WorkerThread implements Runnable{
     private long requestsProcessed;
 
 
-
-
-    public WorkerThread(final Queue<ClientRequest> queue) {
+    public WorkerThread(final Queue<ClientRequest> queue, final int port) {
         this.queue = queue;
+        clientRequestHandler = new ClientRequestHandler(port);
         logger.info("<< Worker Thread initialised >> ");
     }
 
@@ -46,6 +45,11 @@ public class WorkerThread implements Runnable{
                 logger.info("Worker Thread: working on new Client Request");
                 requestsProcessed++;
                 process(queue.poll());
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -80,7 +84,6 @@ public class WorkerThread implements Runnable{
 
                 break;
         }
-
     }
 
     public void logStats(){

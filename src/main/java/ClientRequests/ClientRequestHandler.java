@@ -13,17 +13,20 @@ import java.util.HashMap;
  */
 public class ClientRequestHandler {
 
-    public static final String splitter = "\\.";
-    private final MongoDbConnector mongoDbConnector = new MongoDbConnector();
-    private final LoginRequestHandler loginRequestHandler = new LoginRequestHandler(mongoDbConnector);
-    private final AddNewDataRequestHandler newDataRequestHandler = new AddNewDataRequestHandler(mongoDbConnector);
+    private static final int logRounds = 7;
+    private static final String splitter = "\\|";
+    private final MongoDbConnector mongoDbConnector;
+    private final AuthenticationHandler authenticationHandler;
+    private final UserAccountProcesser accountCreationHandler;
     private final HashMap<String, String> extractedValues = new HashMap<>();
     private SocketChannel responseChannel;
     private final ByteBuffer responseBuffer = ByteBuffer.allocate(1024);
     private final Logger logger = Logger.getLogger(ClientRequestHandler.class);
 
-    public ClientRequestHandler() {
-
+    public ClientRequestHandler(int port) {
+        mongoDbConnector = new MongoDbConnector(port);
+        authenticationHandler = new AuthenticationHandler(mongoDbConnector, logRounds);
+        accountCreationHandler = new UserAccountProcesser(mongoDbConnector, logRounds);
     }
 
     public void handleLoginRequest(final SocketChannel socketChannel, final String message) {
@@ -46,31 +49,31 @@ public class ClientRequestHandler {
 
     }
 
+    //expect NUA.email.name.password
     public void exctractNewUserAccountMessage(final String message) throws IOException {
         String[] newDataValues = message.split(splitter); // EXPECTING RQ1.iris.password
         int size = newDataValues.length;
         logger.info("size of newDataValues: " + size);
-        clearValueMap();
 
-        if ((size % 2 )!= 0) { // not even
-            for (int i = 1; i < size; i = i + 2) {
-                // read 2 and 3 as k, v
-                extractedValues.put(newDataValues[i], newDataValues[i + 1]);
-                System.out.println(newDataValues[i] + ", " + newDataValues[i+1]);
-            }
+        boolean result;
+        if (size == 4) {
+            result = accountCreationHandler.CreateAccount(
+                    newDataValues[1],
+                    newDataValues[2],
+                    newDataValues[3]);
+        } else {
+            result = false;
         }
-        final boolean result = newDataRequestHandler.AddDataToDB(extractedValues);
-
 
         if(result){
-            sendResponse("Successfully Added Data".getBytes());
+            sendResponse("Successfully created new account".getBytes());
         } else {
-            sendResponse("Failed To Add Data".getBytes());
+            sendResponse("Failed to create account".getBytes());
         }
 
     }
 
-    /* expect format RQ1.iris.password */
+    /* expect format RQ1.iris@hotmail.password */
     private void exctractLogonMessage(String message) throws IOException {
         String[] requestUserPass = message.split(splitter); // EXPECTING RQ1.iris.password
         logger.info(requestUserPass.length);
@@ -79,7 +82,7 @@ public class ClientRequestHandler {
             logger.info(requestUserPass[i]);
         }
         if (requestUserPass.length == 3) { // validate the number of fields sent
-            final boolean result = loginRequestHandler.verifyLogonRequest(requestUserPass[1], requestUserPass[2]);
+            final boolean result = authenticationHandler.verifyLogonRequest(requestUserPass[1], requestUserPass[2]);
             logger.info("result=" + result);
             if (result) {
                 logger.info("logged in\n\n");

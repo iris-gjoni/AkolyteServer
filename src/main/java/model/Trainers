@@ -13,17 +13,22 @@ trainer fields:
   permissions - trainer
   accountCreationDate
   isAccountActive
+  trainer info
   possible:
   TrainerRating
 
 
 User fields:
   uniqueId - mongo
-  unique Akolyte userId
-  password - secure
-  permissions = client
+  emailAdress - unique
+  email verified - boolean
+  name - string
+  password - string secure
+  permissions - client/trainer
   accountCreationDate
   isAccountActive
+  booking tokens
+  last payment date
 
 bookingSlot:
   Trainer - the trainer that created it

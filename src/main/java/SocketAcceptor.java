@@ -10,7 +10,6 @@ import java.nio.channels.SocketChannel;
 import java.util.Queue;
 
 
-
 /**
  * Created by irisg on 29/03/2020.
  */
@@ -24,8 +23,9 @@ public class SocketAcceptor implements Runnable {
 
 
     /* only instantiated once as hard coded port */
-    public SocketAcceptor(final Queue<ClientRequest> queue) throws IOException {
-        serverSocketChannel.bind(new InetSocketAddress("192.168.0.8", 1001));
+    public SocketAcceptor(final Queue<ClientRequest> queue, final int port, final String host) throws IOException {
+        serverSocketChannel.bind(new InetSocketAddress(host, port));
+//        serverSocketChannel.configureBlocking(false);
         this.queue = queue;
         logger.info("<< Socket Acceptor Initialised >>");
     }
@@ -44,9 +44,8 @@ public class SocketAcceptor implements Runnable {
             try {
                 byteBuffer.clear();
                 socketChannel = serverSocketChannel.accept();
-                int bytesRead = socketChannel.read(byteBuffer);
-                if (bytesRead > 0) {
-                    handleMessage(socketChannel, bytesRead);
+                if (socketChannel != null) {
+                    handleMessage(socketChannel);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -54,7 +53,9 @@ public class SocketAcceptor implements Runnable {
         }
     }
 
-    private void handleMessage(SocketChannel socketChannel, int bytesRead) throws IOException {
+    private void handleMessage(SocketChannel socketChannel) throws IOException {
+
+        int bytesRead = socketChannel.read(byteBuffer);
 
         byteBuffer.flip();
         logger.info("bytes read: " + bytesRead);

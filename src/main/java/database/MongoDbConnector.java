@@ -20,16 +20,20 @@ public class MongoDbConnector {
     private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
     private MongoCollection<Document> clients;
-    private HashMap<String, Object> valueMap = new HashMap<>();
+    private HashMap<String, String> valueMap = new HashMap<>();
     private MongoHelper helper = new MongoHelper();
     private final Logger logger = Logger.getLogger(MongoDbConnector.class);
+    private int port = 27017;
 
-    public MongoDbConnector() {
+    public MongoDbConnector(final int port) {
+        this.port = port;
         connectToDb();
     }
 
     public void connectToDb() {
-        mongoClient = new MongoClient("localhost", 27017);
+
+        mongoClient = new MongoClient("localhost", port);
+
         logger.debug(mongoClient.toString());
 
         mongoDatabase = mongoClient.getDatabase("testDb");
@@ -50,19 +54,54 @@ public class MongoDbConnector {
         return document;
     }
 
+    public boolean updateTokens(final String email, final int number){
+        BasicDBObject query = new BasicDBObject();
+        query.put("email", email);
+
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.append("tokens", number);
+
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.put("$set", newDocument);
+
+        clients.updateOne(query, updateObject);
+
+        return true;
+    }
+
+    public boolean updateRecord(String email, HashMap<String, String> valueMap){
+        BasicDBObject query = new BasicDBObject();
+        query.put("email", email);
+
+        BasicDBObject newDocument = new BasicDBObject();
+        for (String key : valueMap.keySet()) {
+            newDocument.append(key, valueMap.get(key));
+        }
+
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.put("$set", newDocument);
+
+        clients.updateOne(query, updateObject);
+
+        return true;
+
+    }
+
     private void writeOneDbDocument(Document document) {
         clients.insertOne(document);
         logger.info("successfully wrote data");
     }
 
-    public HashMap<String, String> readData(String user) {
-        Bson bson = new BasicDBObject("name", user);
+    public HashMap<String, String> readByEmail(String email) {
+        clearMap();
+        Bson bson = new BasicDBObject("email", email);
         FindIterable<Document> findIterable = clients.find(bson);
         if (!findIterable.iterator().hasNext()) {
             return helper.emptyMap();
         }
 
-        return helper.extractData(findIterable.iterator().next().toString());
+        helper.extractData(findIterable.iterator().next().toString(), valueMap);
+        return valueMap;
     }
 
     public void writeLoadedValues() {
@@ -100,7 +139,7 @@ public class MongoDbConnector {
     }
 
 
-    public void addValue(final String key, final Object value) {
+    public void addValue(final String key, final String value) {
         valueMap.put(key, value);
     }
 
