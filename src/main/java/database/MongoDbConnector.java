@@ -97,6 +97,7 @@ public class MongoDbConnector {
         Bson bson = new BasicDBObject("email", email);
         FindIterable<Document> findIterable = clients.find(bson);
         if (!findIterable.iterator().hasNext()) {
+            logger.info("returning empty map as email not found");
             return helper.emptyMap();
         }
 

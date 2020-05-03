@@ -3,31 +3,31 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Queue;
-
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created by irisg on 29/03/2020.
+ * Created by irisg on 23/04/2020.
  */
-public class SocketAcceptor implements Runnable {
+public class SSLSocketAcceptor implements Runnable {
 
     private static final int ONE_KB = 1024;
     private final Queue<ClientRequest> queue;
     private final Logger logger = Logger.getLogger(SocketAcceptor.class);
-    private final Socket socket;
+    private final Socket sslSocket;
 
     /* only instantiated once as hard coded port */
-    public SocketAcceptor(final Queue<ClientRequest> queue,
-                          final Socket socket) throws IOException {
-        this.socket = socket;
+    public SSLSocketAcceptor(final ArrayBlockingQueue<ClientRequest> queue,
+                             final Socket socket) throws IOException {
+        this.sslSocket = socket;
         this.queue = queue;
-        logger.info("<< New Socket Acceptor Initialised >>");
+        logger.info("<< Socket Acceptor Initialised >>");
     }
 
     @Override
     public void run() {
         try {
-            if (socket != null) {
-                handleMessage(socket);
+            if (sslSocket != null) {
+                handleMessage(sslSocket);
             }
         } catch (IOException e) {
             e.printStackTrace();

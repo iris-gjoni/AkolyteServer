@@ -9,12 +9,12 @@ import java.util.function.Function;
  */
 public class TestPasswordHashing {
 
-    int logRounds = 7;
-    MongoDbConnector mongoDbConnector = new MongoDbConnector(27017);
-    AuthenticationHandler authenticationHandler = new AuthenticationHandler(mongoDbConnector, logRounds);
+    private int logRounds = 7;
+    private MongoDbConnector mongoDbConnector = new MongoDbConnector(27017);
+    private AuthenticationHandler authenticationHandler = new AuthenticationHandler(mongoDbConnector, logRounds);
 
-    String[] mutableHash = new String[1];
-    Function<String, Boolean> update = hash -> { mutableHash[0] = hash; return true; };
+    private String[] mutableHash = new String[1];
+    private Function<String, Boolean> update = hash -> { mutableHash[0] = hash; return true; };
 
     @Test
     public void testHashing(){

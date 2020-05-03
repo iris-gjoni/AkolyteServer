@@ -4,6 +4,7 @@ import database.MongoDbConnector;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
@@ -19,8 +20,7 @@ public class ClientRequestHandler {
     private final AuthenticationHandler authenticationHandler;
     private final UserAccountProcesser accountCreationHandler;
     private final HashMap<String, String> extractedValues = new HashMap<>();
-    private SocketChannel responseChannel;
-    private final ByteBuffer responseBuffer = ByteBuffer.allocate(1024);
+    private Socket responseSocket;
     private final Logger logger = Logger.getLogger(ClientRequestHandler.class);
 
     public ClientRequestHandler(int port) {
@@ -29,8 +29,8 @@ public class ClientRequestHandler {
         accountCreationHandler = new UserAccountProcesser(mongoDbConnector, logRounds);
     }
 
-    public void handleLoginRequest(final SocketChannel socketChannel, final String message) {
-        this.responseChannel = socketChannel;
+    public void handleLoginRequest(final Socket socket, final String message) {
+        this.responseSocket = socket;
         try {
             exctractLogonMessage(message);
         } catch (IOException e) {
@@ -39,8 +39,8 @@ public class ClientRequestHandler {
     }
 
     /* expect format RQ2.name.name.password.password.other.n.n2... */
-    public void handleNewUserAccountRequest(final SocketChannel socketChannel, final String message) {
-        this.responseChannel = socketChannel;
+    public void handleNewUserAccountRequest(final Socket socket, final String message) {
+        this.responseSocket = socket;
         try {
             exctractNewUserAccountMessage(message);
         } catch (Exception e) {
@@ -70,7 +70,6 @@ public class ClientRequestHandler {
         } else {
             sendResponse("Failed to create account".getBytes());
         }
-
     }
 
     /* expect format RQ1.iris@hotmail.password */
@@ -91,15 +90,11 @@ public class ClientRequestHandler {
                 logger.info("failed login\n\n");
                 sendResponse("Failed Authentication".getBytes());
             }
-
         }
     }
 
     private void sendResponse(byte[] bytes) throws IOException {
-        responseBuffer.clear();
-        responseBuffer.put(bytes);
-        responseBuffer.flip();
-        responseChannel.write(responseBuffer);
+        responseSocket.getOutputStream().write(bytes);
     }
 
     public void clearValueMap(){
@@ -108,19 +103,19 @@ public class ClientRequestHandler {
 
     /* in order to control who is able to create a Trainer account we will create the accounts on our side and give them a login
     * the trainers will then open the app, login with the default login and be prompted to update their account info*/
-    public void handleUpdateAccountRequest(SocketChannel socketChannel, String message) {
+    public void handleUpdateAccountRequest(final Socket socket, final String message) {
 
     }
 
-    public void handleLoadAvaibleSlotsRequest(SocketChannel socketChannel, String message) {
+    public void handleLoadAvaibleSlotsRequest(final Socket socket, final String message) {
 
     }
 
-    public void handleBookSlotRequest(SocketChannel socketChannel, String message) {
+    public void handleBookSlotRequest(final Socket socket, final String message) {
 
     }
 
-    public void handlePaymentComplete(SocketChannel socketChannel, String message) {
+    public void handlePaymentComplete(final Socket socket, final String message) {
 
     }
 

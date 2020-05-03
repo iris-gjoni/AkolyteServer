@@ -1,15 +1,12 @@
 import ClientRequests.ClientRequestHandler;
 import org.apache.log4j.Logger;
-import org.apache.log4j.net.SyslogAppender;
-import org.apache.log4j.receivers.db.dialect.SybaseDialect;
-
-import java.nio.channels.SocketChannel;
-import java.util.Queue;
+import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by irisg on 14/04/2020.
  */
-public class WorkerThread implements Runnable{
+public class WorkerThread implements Runnable {
 
     public static final String LOGIN = "RQ1";
     public static final String CREATE_USER_ACCOUNT = "CNU";
@@ -20,7 +17,7 @@ public class WorkerThread implements Runnable{
     public static final String PAYMENT_COMPLETE = "PAY";
 
     public boolean running = true;
-    private final Queue<ClientRequest> queue;
+    private final ArrayBlockingQueue<ClientRequest> queue;
     private final ClientRequestHandler clientRequestHandler;
     private static final Logger logger = Logger.getLogger(WorkerThread.class);
 
@@ -29,7 +26,7 @@ public class WorkerThread implements Runnable{
     private long requestsProcessed;
 
 
-    public WorkerThread(final Queue<ClientRequest> queue, final int port) {
+    WorkerThread(final ArrayBlockingQueue<ClientRequest> queue, final int port) {
         this.queue = queue;
         clientRequestHandler = new ClientRequestHandler(port);
         logger.info("<< Worker Thread initialised >> ");
@@ -40,7 +37,7 @@ public class WorkerThread implements Runnable{
         lastTime = System.currentTimeMillis();
         while (running) { // busy spin
             logStats();
-            if (queue.peek() != null){
+            if (queue.peek() != null) {
                 /* we have data to work on */
                 logger.info("Worker Thread: working on new Client Request");
                 requestsProcessed++;
@@ -54,44 +51,43 @@ public class WorkerThread implements Runnable{
         }
     }
 
-    private void process(final ClientRequest context){
+    private void process(final ClientRequest context) {
 
         String message = context.getMessage();
-        SocketChannel socketChannel = context.getSocketChannel();
+        Socket socket = context.getSocket();
 
         String requestType = message.substring(0, 3);
 
         switch (requestType) {
             case LOGIN:
-                clientRequestHandler.handleLoginRequest(socketChannel, message);
+                clientRequestHandler.handleLoginRequest(socket, message);
                 break;
             case CREATE_USER_ACCOUNT:
-                clientRequestHandler.handleNewUserAccountRequest(socketChannel, message);
+                clientRequestHandler.handleNewUserAccountRequest(socket, message);
                 break;
             case UPDATE_ACCOUNT:
-                clientRequestHandler.handleUpdateAccountRequest(socketChannel, message);
+                clientRequestHandler.handleUpdateAccountRequest(socket, message);
                 break;
             case LOAD_AVAILABLE_SLOTS:
-                clientRequestHandler.handleLoadAvaibleSlotsRequest(socketChannel, message);
+                clientRequestHandler.handleLoadAvaibleSlotsRequest(socket, message);
                 break;
             case BOOK_SLOT:
-                clientRequestHandler.handleBookSlotRequest(socketChannel, message);
+                clientRequestHandler.handleBookSlotRequest(socket, message);
                 break;
             case PAYMENT_COMPLETE:
-                clientRequestHandler.handlePaymentComplete(socketChannel, message);
+                clientRequestHandler.handlePaymentComplete(socket, message);
                 break;
             default:
-
                 break;
         }
     }
 
-    public void logStats(){
+    private void logStats() {
         long timeNow = System.currentTimeMillis();
-        if ((lastTime + STATS_TIME_MILLIS) - timeNow< 0){
+        if ((lastTime + STATS_TIME_MILLIS) - timeNow < 0) {
             lastTime = timeNow;
             logger.info("requests processed: " + requestsProcessed +
-                    " - in " + STATS_TIME_MILLIS/1000 + "s");
+                    " - in " + STATS_TIME_MILLIS / 1000 + "s");
             requestsProcessed = 0;
         }
     }

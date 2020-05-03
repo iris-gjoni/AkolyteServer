@@ -4,4 +4,9 @@ socketConnectHost: "192.168.0.8"
 mongoConnectPort: 27017
 mongoConnectHost: "192.168.0.8"
 logFilePath: "file:///C:/workspace/major1/src/companyApp/src/main/properties/log4j.xml"
+useSSL: true
+keyStoreFilePath: "src/main/properties/serverCA.jks"
+keyStorePassword: "gjoniserver"
+trustFilePath: "src/main/properties/serverTruststore.jks"
+trustStorePassword: "gjoniserver"
 

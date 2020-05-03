@@ -1,25 +1,25 @@
-import java.nio.channels.SocketChannel;
+import java.net.Socket;
 
 /**
  * Created by irisg on 14/04/2020.
  */
 public class ClientRequest {
 
-    private SocketChannel socketChannel;
+    private Socket socket;
     private String message;
 
-    public ClientRequest(SocketChannel socketChannel, String message) {
-        this.socketChannel = socketChannel;
+    public ClientRequest(Socket socketChannel, String message) {
+        this.socket = socketChannel;
         this.message = message;
     }
 
     public void reset(){
-        this.socketChannel = null;
+        this.socket = null;
         this.message = null;
     }
 
-    public SocketChannel getSocketChannel() {
-        return socketChannel;
+    public Socket getSocket() {
+        return socket;
     }
 
     public String getMessage() {

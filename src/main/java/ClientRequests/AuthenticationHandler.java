@@ -25,7 +25,7 @@ public class AuthenticationHandler {
 
     boolean verifyLogonRequest(final String email, final String pass) {
         HashMap<String, String> userData = mongoDbConnector.readByEmail(email);
-        if (userData != null) {
+        if (!userData.isEmpty()) {
             if (verifyHash(pass, userData.get("password"))) {
                 return true;
             }
