@@ -21,7 +21,9 @@ public class TestPasswordHashing {
 
         String pass = "password";
 
+        long startTime = System.currentTimeMillis();
         String hashedPass = authenticationHandler.hash(pass);
+        System.out.println("time taken = " + (System.currentTimeMillis() - startTime) + "ms");
 
         System.out.println(pass);
         System.out.println(hashedPass);

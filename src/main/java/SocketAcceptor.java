@@ -40,10 +40,11 @@ public class SocketAcceptor implements Runnable {
         logger.info("bytes read: " + bytesRead);
 
         if (bytesRead > 0) {
+            final long startTime = System.currentTimeMillis();
             String message = new String(readBytes, 0, bytesRead);
             logger.info(message);
             logger.info("message type:" + message.substring(0, 3));
-            queue.add(new ClientRequest(socket, message));
+            queue.add(new ClientRequest(socket, message, startTime));
         } else {
             logger.error("0 bytes read from the socket");
         }

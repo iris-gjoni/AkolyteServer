@@ -53,29 +53,30 @@ public class WorkerThread implements Runnable {
 
     private void process(final ClientRequest context) {
 
-        String message = context.getMessage();
-        Socket socket = context.getSocket();
+        final String message = context.getMessage();
+        final Socket socket = context.getSocket();
+        final long startTime = context.getStartTime();
 
         String requestType = message.substring(0, 3);
 
         switch (requestType) {
             case LOGIN:
-                clientRequestHandler.handleLoginRequest(socket, message);
+                clientRequestHandler.handleLoginRequest(socket, message, startTime);
                 break;
             case CREATE_USER_ACCOUNT:
-                clientRequestHandler.handleNewUserAccountRequest(socket, message);
+                clientRequestHandler.handleNewUserAccountRequest(socket, message, startTime);
                 break;
             case UPDATE_ACCOUNT:
-                clientRequestHandler.handleUpdateAccountRequest(socket, message);
+                clientRequestHandler.handleUpdateAccountRequest(socket, message, startTime);
                 break;
             case LOAD_AVAILABLE_SLOTS:
-                clientRequestHandler.handleLoadAvaibleSlotsRequest(socket, message);
+                clientRequestHandler.handleLoadAvaibleSlotsRequest(socket, message, startTime);
                 break;
             case BOOK_SLOT:
-                clientRequestHandler.handleBookSlotRequest(socket, message);
+                clientRequestHandler.handleBookSlotRequest(socket, message, startTime);
                 break;
             case PAYMENT_COMPLETE:
-                clientRequestHandler.handlePaymentComplete(socket, message);
+                clientRequestHandler.handlePaymentComplete(socket, message, startTime);
                 break;
             default:
                 break;

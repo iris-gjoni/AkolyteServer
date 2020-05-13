@@ -44,10 +44,9 @@ public class TestUpdateAccount {
 
         long startTime = System.currentTimeMillis();
         boolean result = userAccountProcesser.addToRecord(email, keys, values, size);
-        System.out.println("time taken = " + (System.currentTimeMillis() - startTime));
+        System.out.println("time taken = " + (System.currentTimeMillis() - startTime) + "ms");
 
         assert result;
-
     }
 
 }

@@ -22,15 +22,16 @@ public class ClientRequestHandler {
     private final HashMap<String, String> extractedValues = new HashMap<>();
     private Socket responseSocket;
     private final Logger logger = Logger.getLogger(ClientRequestHandler.class);
-
+    private long startTime;
     public ClientRequestHandler(int port) {
         mongoDbConnector = new MongoDbConnector(port);
         authenticationHandler = new AuthenticationHandler(mongoDbConnector, logRounds);
         accountCreationHandler = new UserAccountProcesser(mongoDbConnector, logRounds);
     }
 
-    public void handleLoginRequest(final Socket socket, final String message) {
+    public void handleLoginRequest(final Socket socket, final String message, final long startTime) {
         this.responseSocket = socket;
+        this.startTime = startTime;
         try {
             exctractLogonMessage(message);
         } catch (IOException e) {
@@ -38,9 +39,10 @@ public class ClientRequestHandler {
         }
     }
 
-    /* expect format RQ2.name.name.password.password.other.n.n2... */
-    public void handleNewUserAccountRequest(final Socket socket, final String message) {
+    /* expect format NUA.name.name.password.password.other.n.n2... */
+    public void handleNewUserAccountRequest(final Socket socket, final String message, final long startTime) {
         this.responseSocket = socket;
+        this.startTime = startTime;
         try {
             exctractNewUserAccountMessage(message);
         } catch (Exception e) {
@@ -95,6 +97,7 @@ public class ClientRequestHandler {
 
     private void sendResponse(byte[] bytes) throws IOException {
         responseSocket.getOutputStream().write(bytes);
+        logger.info("request time = " + (System.currentTimeMillis() - startTime)+ "ms");
     }
 
     public void clearValueMap(){
@@ -103,19 +106,19 @@ public class ClientRequestHandler {
 
     /* in order to control who is able to create a Trainer account we will create the accounts on our side and give them a login
     * the trainers will then open the app, login with the default login and be prompted to update their account info*/
-    public void handleUpdateAccountRequest(final Socket socket, final String message) {
+    public void handleUpdateAccountRequest(final Socket socket, final String message, final long startTime) {
 
     }
 
-    public void handleLoadAvaibleSlotsRequest(final Socket socket, final String message) {
+    public void handleLoadAvaibleSlotsRequest(final Socket socket, final String message, final long startTime) {
 
     }
 
-    public void handleBookSlotRequest(final Socket socket, final String message) {
+    public void handleBookSlotRequest(final Socket socket, final String message, final long startTime) {
 
     }
 
-    public void handlePaymentComplete(final Socket socket, final String message) {
+    public void handlePaymentComplete(final Socket socket, final String message, final long startTime) {
 
     }
 

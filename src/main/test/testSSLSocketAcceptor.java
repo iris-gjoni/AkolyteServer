@@ -2,11 +2,8 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import javax.net.ssl.*;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -131,30 +128,12 @@ public class testSSLSocketAcceptor {
 //                new File(keyStoreFilePath)), keyStorePass.toCharArray());
 
 
-//        System.setProperty("javax.net.ssl.trustStore", trustFilePath);
-//        System.setProperty("javax.net.ssl.trustStorePassword", trustStorePass);
-
         SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
         SSLSocket sslsocket = (SSLSocket) sslsocketfactory
                 .createSocket("192.168.0.8", 1001);
-//        sslsocket.setUseClientMode(true);
-//        sslsocket.startHandshake();
 
 
         sslsocket.getOutputStream().write("RQ1|test|test".getBytes());
-
-
-//        KeyManagerFactory kmf = KeyManagerFactory.getInstance("x509");
-//        kmf.init(ks, "keystorePassword".toCharArray());
-
-//        TrustManagerFactory tmf = TrustManagerFactory.getInstance("rsa");
-//        tmf.init(ks);
-
-//        SSLContext sc = SSLContext.getInstance("TLS");
-//        sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), SecureRandom.getInstance("rsa") );
-//        sc.getServerSocketFactory().createServerSocket();
-//        SSLServerSocket sslServerSocket =
-//                (SSLServerSocket) sc.getServerSocketFactory().createServerSocket();
 
     }
 
