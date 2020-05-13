@@ -29,7 +29,6 @@ public class Main {
 
 
 
-
     /* src/main/properties/config-dev.yaml */
 
     public static void main(String args[]) throws IOException {
